@@ -42,7 +42,7 @@ def select_pizza_budies():
   if not data:
     return (jsonify({'error': 'No data provided'}), 400)
    
-  selected_name = data
+  selected_name = data.get('name')
   selected_person = df[df['Nombre completo'] == selected_name].iloc[:, 1:].values[0] 
 
   similarities = []
