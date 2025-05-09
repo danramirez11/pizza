@@ -63,10 +63,7 @@ def select_pizza_budies():
       # Sort and get top K
       
   top_k = sorted(similarities, key=lambda x: x[1], reverse=True)[:k]
-
-  top_k_json = json.dumps(top_k, ensure_ascii=False)
-
-  return (jsonify(top_k_json), 200)
+  return jsonify(top_k), 200
    
 
 # Execute the app instance
