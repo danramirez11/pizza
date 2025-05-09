@@ -36,34 +36,32 @@ def get_names():
     return (jsonify(names), 200)
 
 @app.route('/pizza', methods=['POST'])
-def select_pizza_budies():
-  data = request.get_json()
+def select_pizza_buddies():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
 
-  if not data:
-    return (jsonify({'error': 'No data provided'}), 400)
-   
-  selected_name = data.get('name')
-  selected_person = df[df['Nombre completo'] == selected_name].iloc[:, 1:].values[0] 
+    selected_name = data.get('name')
+    if selected_name not in df['Nombre completo'].values:
+        return jsonify({'error': 'Name not found'}), 404
 
-  similarities = []
-   
-  for _, row in df.iterrows():
-    other_name = row['Nombre completo']
-    if other_name == selected_name:
-        continue
-    
-    other_person = row.iloc[1:].values  # Exclude name
-    dot_product = np.dot(selected_person, other_person)
-    magnitude1 = np.linalg.norm(selected_person)
-    magnitude2 = np.linalg.norm(other_person)
+    selected_person = df[df['Nombre completo'] == selected_name].iloc[:, 1:].values[0]
+    similarities = []
 
-    similarity = dot_product / (magnitude1 * magnitude2)
-    similarities.append((other_name, similarity))
+    for _, row in df.iterrows():
+        other_name = row['Nombre completo']
+        if other_name == selected_name:
+            continue
 
-      # Sort and get top K
-      
-  top_k = sorted(similarities, key=lambda x: x[1], reverse=True)[:k]
-  return jsonify(top_k), 200
+        other_person = row.iloc[1:].values
+        dot_product = np.dot(selected_person, other_person)
+        magnitude1 = np.linalg.norm(selected_person)
+        magnitude2 = np.linalg.norm(other_person)
+        similarity = dot_product / (magnitude1 * magnitude2)
+        similarities.append((other_name, similarity))
+
+    top_k = sorted(similarities, key=lambda x: x[1], reverse=True)[:k]
+    return jsonify(top_k), 200
    
 
 # Execute the app instance
